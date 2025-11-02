@@ -1,10 +1,15 @@
 
+
 import React, { useState, useEffect } from 'react';
-import { districtData } from './data/districts';
 
 interface GeminiModalProps {
     districtName: string | null;
     onClose: () => void;
+}
+
+interface Source {
+    uri: string;
+    title: string;
 }
 
 const GeminiModal: React.FC<GeminiModalProps> = ({ districtName, onClose }) => {
@@ -19,20 +24,55 @@ const GeminiModal: React.FC<GeminiModalProps> = ({ districtName, onClose }) => {
         setIsLoading(true);
         setContent(null);
 
-        // Random delay between 1 and 2 seconds with a 0.2s step
-        const randomDelay = 1000 + Math.floor(Math.random() * 6) * 200; 
+        const fetchDistrictInfo = async () => {
+            try {
+                const response = await fetch('/api/gemini', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ districtName }),
+                });
 
-        const timer = setTimeout(() => {
-            const data = districtData[districtName];
-            if (data) {
-                setContent(data.description);
-            } else {
-                setContent('Подробная информация об этом районе скоро появится.');
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || 'Не удалось получить информацию от AI.');
+                }
+
+                const data = await response.json();
+                
+                const formattedContent = (
+                    <>
+                        <p>{data.content}</p>
+                        {data.sources && data.sources.length > 0 && (
+                            <div className="mt-4 pt-4 border-t border-gray-700">
+                                <h5 className="font-semibold text-gray-400 text-sm mb-2">Источники:</h5>
+                                <ul className="list-disc list-inside text-xs space-y-1">
+                                    {data.sources.map((source: Source, index: number) => (
+                                        <li key={index}>
+                                            <a href={source.uri} target="_blank" rel="noopener noreferrer" className="text-amber-400 hover:underline">
+                                                {source.title}
+                                            </a>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        )}
+                    </>
+                );
+                setContent(formattedContent);
+
+            } catch (error: any) {
+                 setContent(
+                    <p className="text-red-400">
+                        Ошибка: {error.message || 'Не удалось загрузить данные.'}
+                    </p>
+                );
+            } finally {
+                setIsLoading(false);
             }
-            setIsLoading(false);
-        }, randomDelay);
+        };
 
-        return () => clearTimeout(timer);
+        fetchDistrictInfo();
+
     }, [districtName]);
 
     if (!districtName) {
