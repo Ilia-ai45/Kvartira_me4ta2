@@ -35,7 +35,8 @@ export default async function handler(request, response) {
     const {
         TELEGRAM_BOT_TOKEN,
         TELEGRAM_CHAT_ID,
-        GOOGLE_SHEET_ID
+        GOOGLE_SHEET_ID,
+        GOOGLE_SHEET_NAME // Added for flexibility
     } = process.env;
 
     const formData = request.body;
@@ -76,9 +77,11 @@ export default async function handler(request, response) {
                 details
             ];
 
+            const sheetName = GOOGLE_SHEET_NAME || 'Лист1'; // Use env var, fallback to 'Лист1'
+
             await sheets.spreadsheets.values.append({
                 spreadsheetId: GOOGLE_SHEET_ID,
-                range: 'Лист1!A1', // Assumes data is on a sheet named 'Лист1'
+                range: `${sheetName}!A1`, // Use the configured sheet name
                 valueInputOption: 'USER_ENTERED',
                 resource: {
                     values: [rowData],
