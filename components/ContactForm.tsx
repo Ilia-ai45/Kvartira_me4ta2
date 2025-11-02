@@ -149,9 +149,22 @@ const ContactForm: React.FC<ContactFormProps> = ({ showExtended, calculatorData,
             });
 
             if (!response.ok) {
-                const errorData = await response.json();
-                // Throw an error with the message from the server
-                throw new Error(errorData.message || 'Произошла неизвестная ошибка на сервере.');
+                let errorMessage = 'Произошла неизвестная ошибка на сервере.';
+                try {
+                    // First, try to parse the response as JSON, as this is the expected format for our custom errors.
+                    const errorData = await response.json();
+                    errorMessage = errorData.message || errorMessage;
+                } catch (jsonError) {
+                    // If parsing as JSON fails, it means the server returned something else (e.g., HTML error page from Vercel).
+                    const errorText = await response.text();
+                    // Avoid showing the user a full HTML page.
+                    if (errorText && !errorText.trim().startsWith('<')) {
+                       errorMessage = errorText;
+                    } else {
+                        errorMessage = 'Произошла критическая ошибка на сервере. Попробуйте позже.';
+                    }
+                }
+                throw new Error(errorMessage);
             }
 
             setSubmitted(true);
@@ -162,7 +175,6 @@ const ContactForm: React.FC<ContactFormProps> = ({ showExtended, calculatorData,
 
         } catch (error: any) {
             console.error("Submit error:", error);
-            // The error message now comes from the server or the catch block above
             setSubmitError(error.message || 'Не удалось отправить заявку. Пожалуйста, свяжитесь со мной напрямую или попробуйте позже.');
         } finally {
             setIsSubmitting(false);
