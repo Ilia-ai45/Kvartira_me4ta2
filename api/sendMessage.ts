@@ -8,7 +8,8 @@ const getSheetsClient = () => {
     const { GOOGLE_SERVICE_ACCOUNT_EMAIL, GOOGLE_PRIVATE_KEY } = process.env;
 
     if (!GOOGLE_SERVICE_ACCOUNT_EMAIL || !GOOGLE_PRIVATE_KEY) {
-        throw new Error("Google Service Account credentials are not set.");
+        console.error("CRITICAL: Google Service Account credentials are not set in environment variables.");
+        throw new Error("Ошибка конфигурации сервера: не найдены учетные данные Google.");
     }
 
     // Vercel replaces newlines in env vars with \\n. We need to convert them back.
@@ -86,10 +87,14 @@ export default async function handler(request, response) {
 
             return { status: 'success', service: 'Google Sheets' };
         } catch (error) {
-            console.error("Error sending to Google Sheets:", error.message);
-            // Provide a more detailed error for debugging
-            const errorMessage = error.response?.data?.error?.message || error.message;
-            return { status: 'failed', service: 'Google Sheets', error: errorMessage };
+            console.error("--- ERROR SENDING TO GOOGLE SHEETS ---");
+            console.error("Timestamp:", new Date().toISOString());
+            console.error("Error Message:", error.message);
+            // Log the detailed error object which often contains more info
+            console.error("Full Error Object:", JSON.stringify(error, null, 2));
+            
+            const userFriendlyMessage = `Ошибка Google Sheets: ${error.message}. Проверьте права доступа и имя листа.`;
+            return { status: 'failed', service: 'Google Sheets', error: userFriendlyMessage };
         }
     };
 
@@ -137,8 +142,11 @@ export default async function handler(request, response) {
             }
             return { status: 'success', service: 'Telegram' };
         } catch (error) {
-            console.error("Error sending to Telegram:", error);
-            return { status: 'failed', service: 'Telegram', error: error.message };
+            console.error("--- ERROR SENDING TO TELEGRAM ---");
+            console.error("Timestamp:", new Date().toISOString());
+            console.error("Error Message:", error.message);
+            const userFriendlyMessage = `Ошибка Telegram: ${error.message}. Проверьте токен и ID чата.`;
+            return { status: 'failed', service: 'Telegram', error: userFriendlyMessage };
         }
     };
 
@@ -150,14 +158,14 @@ export default async function handler(request, response) {
 
     const fulfilledResults = results.filter(
         (r): r is PromiseFulfilledResult<{ status: string; service: string; error?: any; }> => r.status === 'fulfilled'
-    );
+    ).map(r => r.value);
     
     const successfulSubmissions = fulfilledResults
-        .filter(r => r.value.status === 'success')
-        .map(r => r.value.service);
+        .filter(r => r.status === 'success')
+        .map(r => r.service);
 
     const failedSubmissions = fulfilledResults
-        .filter(r => r.value.status === 'failed');
+        .filter(r => r.status === 'failed');
 
     if (successfulSubmissions.length > 0) {
         if (failedSubmissions.length > 0) {
@@ -166,10 +174,12 @@ export default async function handler(request, response) {
         return response.status(200).json({ success: true, services: successfulSubmissions });
     } else {
         console.error("All submissions failed:", failedSubmissions);
+        // Combine error messages for a more informative response to the client
+        const errorMessages = failedSubmissions.map(f => f.error).join('; ');
         return response.status(500).json({
             success: false,
-            message: 'Не удалось отправить заявку ни в один из сервисов.',
-            errors: failedSubmissions.map(f => f.value)
+            message: `Не удалось отправить заявку. Причина: ${errorMessages}`,
+            errors: failedSubmissions
         });
     }
 }

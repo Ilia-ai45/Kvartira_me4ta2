@@ -150,7 +150,8 @@ const ContactForm: React.FC<ContactFormProps> = ({ showExtended, calculatorData,
 
             if (!response.ok) {
                 const errorData = await response.json();
-                throw new Error(errorData.message || 'Произошла ошибка при отправке.');
+                // Throw an error with the message from the server
+                throw new Error(errorData.message || 'Произошла неизвестная ошибка на сервере.');
             }
 
             setSubmitted(true);
@@ -161,7 +162,8 @@ const ContactForm: React.FC<ContactFormProps> = ({ showExtended, calculatorData,
 
         } catch (error: any) {
             console.error("Submit error:", error);
-            setSubmitError('Не удалось отправить заявку. Пожалуйста, свяжитесь со мной напрямую или попробуйте позже.');
+            // The error message now comes from the server or the catch block above
+            setSubmitError(error.message || 'Не удалось отправить заявку. Пожалуйста, свяжитесь со мной напрямую или попробуйте позже.');
         } finally {
             setIsSubmitting(false);
         }
