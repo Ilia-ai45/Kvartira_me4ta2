@@ -1,6 +1,7 @@
 
 
 import React, { useState, useEffect } from 'react';
+import { districtData } from './data/districts';
 
 interface GeminiModalProps {
     districtName: string | null;
@@ -61,11 +62,16 @@ const GeminiModal: React.FC<GeminiModalProps> = ({ districtName, onClose }) => {
                 setContent(formattedContent);
 
             } catch (error: any) {
-                 setContent(
-                    <p className="text-red-400">
-                        Ошибка: {error.message || 'Не удалось загрузить данные.'}
-                    </p>
-                );
+                 console.error("Gemini API call failed, using fallback content:", error);
+                 if (districtName && districtData[districtName]) {
+                     setContent(districtData[districtName].description);
+                 } else {
+                     setContent(
+                        <p className="text-red-400">
+                            К сожалению, не удалось загрузить информацию о районе. Пожалуйста, попробуйте позже.
+                        </p>
+                     );
+                 }
             } finally {
                 setIsLoading(false);
             }
