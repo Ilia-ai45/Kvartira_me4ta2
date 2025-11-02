@@ -1,5 +1,6 @@
 // File path: /api/sendMessage.ts
 import type { VercelRequest, VercelResponse } from '@vercel/node';
+import { google } from 'googleapis';
 
 const formatCurrency = (value: number) => new Intl.NumberFormat('ru-RU', { style: 'currency', currency: 'RUB', minimumFractionDigits: 0 }).format(value);
 
@@ -12,11 +13,14 @@ export default async function handler(request: VercelRequest, response: VercelRe
         const {
             TELEGRAM_BOT_TOKEN,
             TELEGRAM_CHAT_ID,
+            GOOGLE_PRIVATE_KEY,
+            GOOGLE_CLIENT_EMAIL,
+            GOOGLE_SHEET_ID,
         } = process.env;
 
         // 1. Проверка наличия переменных окружения
         if (!TELEGRAM_BOT_TOKEN || !TELEGRAM_CHAT_ID) {
-            console.error("SERVER CONFIG ERROR: Telegram environment variables (TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID) are not set in Vercel.");
+            console.error("SERVER CONFIG ERROR: Telegram environment variables are not set.");
             return response.status(500).json({
                 success: false,
                 message: 'Не удалось отправить заявку. Причина: неверная конфигурация сервера (Telegram).'
@@ -28,7 +32,7 @@ export default async function handler(request: VercelRequest, response: VercelRe
             return response.status(400).json({ message: 'Имя и телефон обязательны.' });
         }
 
-        // 2. Формирование сообщения
+        // 2. Формирование сообщения для Telegram
         let message = `*Новая заявка с сайта!*\n\n*Имя:* ${formData.name}\n*Телефон:* \`${formData.phone}\``;
 
         if (formData.showExtended && formData.calculatorData) {
@@ -60,23 +64,68 @@ export default async function handler(request: VercelRequest, response: VercelRe
             signal: AbortSignal.timeout(10000) // 10-секундный таймаут
         });
 
-        // 4. Обработка ответа от Telegram API
         if (!telegramResponse.ok) {
              const errorData = await telegramResponse.json();
              const description = errorData.description || 'Unknown Telegram API error';
              console.error(`Telegram API Error: ${description}`, errorData);
-             
              let userMessage = `Ошибка отправки в Telegram.`;
              if (description.includes('chat not found')) {
                 userMessage = 'Ошибка конфигурации: чат для уведомлений не найден. Проверьте TELEGRAM_CHAT_ID.'
              } else if (description.includes('bot token')) {
                 userMessage = 'Ошибка конфигурации: неверный токен Telegram бота. Проверьте TELEGRAM_BOT_TOKEN.'
              }
-             
              return response.status(500).json({
                  success: false,
                  message: `Не удалось отправить заявку. ${userMessage}`
              });
+        }
+
+        // 4. Отправка в Google Sheets (не блокирует успешный ответ, если Telegram сработал)
+        try {
+            if (!GOOGLE_PRIVATE_KEY || !GOOGLE_CLIENT_EMAIL || !GOOGLE_SHEET_ID) {
+                console.warn("SERVER CONFIG WARNING: Google Sheets environment variables are not set. Skipping sheet update.");
+            } else {
+                const auth = new google.auth.JWT(
+                    GOOGLE_CLIENT_EMAIL,
+                    undefined,
+                    GOOGLE_PRIVATE_KEY.replace(/\\n/g, '\n'),
+                    ['https://www.googleapis.com/auth/spreadsheets']
+                );
+
+                const sheets = google.sheets({ version: 'v4', auth });
+                const now = new Date().toLocaleString('ru-RU', { timeZone: 'Europe/Moscow' });
+                
+                const rowValues = [
+                    now,
+                    formData.name,
+                    formData.phone,
+                ];
+
+                if (formData.showExtended && formData.calculatorData) {
+                    const { calculatorData, rooms, priority } = formData;
+                    rowValues.push(
+                        formatCurrency(calculatorData.propertyPrice),
+                        formatCurrency(calculatorData.downPayment),
+                        formatCurrency(calculatorData.monthlyPayment),
+                        `${calculatorData.interestRate}%`,
+                        calculatorData.quickDealDiscount ? 'Да' : 'Нет',
+                        rooms || 'Не указано',
+                        priority || 'Не указано'
+                    );
+                }
+
+                await sheets.spreadsheets.values.append({
+                    spreadsheetId: GOOGLE_SHEET_ID,
+                    range: 'Лист1!A1', // Appends to the first empty row of the table
+                    valueInputOption: 'USER_ENTERED',
+                    requestBody: {
+                        values: [rowValues],
+                    },
+                });
+            }
+        } catch (sheetsError) {
+            console.error("Google Sheets API Error:", sheetsError);
+            // Не отправляем ошибку клиенту, так как основная функция (Telegram) выполнена
         }
         
         // 5. Успешный ответ
