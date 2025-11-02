@@ -33,7 +33,8 @@ export default async function handler(request: VercelRequest, response: VercelRe
         }
 
         // 2. Формирование сообщения для Telegram
-        let message = `*Новая заявка с сайта!*\n\n*Имя:* ${formData.name}\n*Телефон:* \`${formData.phone}\``;
+        const messageTitle = formData.showExtended ? `*Новая заявка на подбор!*` : `*Запрос на консультацию!*`;
+        let message = `${messageTitle}\n\n*Имя:* ${formData.name}\n*Телефон:* \`${formData.phone}\``;
 
         if (formData.showExtended && formData.calculatorData) {
             const { calculatorData, rooms, priority } = formData;
@@ -95,15 +96,15 @@ export default async function handler(request: VercelRequest, response: VercelRe
                 const sheets = google.sheets({ version: 'v4', auth });
                 const now = new Date().toLocaleString('ru-RU', { timeZone: 'Europe/Moscow' });
                 
-                const rowValues = [
-                    now,
-                    formData.name,
-                    formData.phone,
-                ];
+                let rowValues: (string | number)[];
 
                 if (formData.showExtended && formData.calculatorData) {
                     const { calculatorData, rooms, priority } = formData;
-                    rowValues.push(
+                    rowValues = [
+                        now,
+                        formData.name,
+                        formData.phone,
+                        'Подбор (с калькулятора)',
                         formatCurrency(calculatorData.propertyPrice),
                         formatCurrency(calculatorData.downPayment),
                         formatCurrency(calculatorData.monthlyPayment),
@@ -111,7 +112,15 @@ export default async function handler(request: VercelRequest, response: VercelRe
                         calculatorData.quickDealDiscount ? 'Да' : 'Нет',
                         rooms || 'Не указано',
                         priority || 'Не указано'
-                    );
+                    ];
+                } else {
+                     rowValues = [
+                        now,
+                        formData.name,
+                        formData.phone,
+                        'Консультация',
+                        '', '', '', '', '', '', '' // Пустые ячейки для сохранения структуры
+                    ];
                 }
 
                 await sheets.spreadsheets.values.append({

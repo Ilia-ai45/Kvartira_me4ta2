@@ -213,9 +213,9 @@ const ContactForm: React.FC<ContactFormProps> = ({ showExtended, calculatorData,
                                 </>
                             ) : (
                                 <>
-                                    <h2 className="text-3xl sm:text-4xl font-extrabold text-white mb-4">Готовы сделать первый шаг?</h2>
+                                    <h2 className="text-3xl sm:text-4xl font-extrabold text-white mb-4">Нужна консультация?</h2>
                                     <p className="text-base sm:text-lg text-gray-400 mb-8">
-                                        Оставьте контакты, и я подготовлю для вас персональную подборку лучших новостроек Тюмени. Это бесплатно и ни к чему не обязывает.
+                                        Оставьте контакты, и я свяжусь с вами, чтобы ответить на все ваши вопросы. Это бесплатно и ни к чему не обязывает.
                                     </p>
                                 </>
                             )}
@@ -282,7 +282,7 @@ const ContactForm: React.FC<ContactFormProps> = ({ showExtended, calculatorData,
                                         disabled={isSubmitting}
                                         className="w-full py-3 px-4 rounded-full text-lg font-semibold text-gray-900 bg-amber-500 hover:bg-amber-400 focus:outline-none focus:ring-4 focus:ring-amber-500/30 transition-all duration-300 disabled:bg-gray-500 disabled:cursor-not-allowed"
                                     >
-                                        {isSubmitting ? 'Отправка...' : (showExtended ? 'Отправить и получить подборку' : 'Получить подборку')}
+                                        {isSubmitting ? 'Отправка...' : (showExtended ? 'Отправить и получить подборку' : 'Получить консультацию')}
                                     </button>
                                 </div>
                                 {submitError && (
