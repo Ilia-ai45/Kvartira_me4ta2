@@ -13,11 +13,39 @@ import Map from './Map';
 import GeminiModal from './GeminiModal';
 import PrivacyPolicy from './PrivacyPolicy';
 
+// Объявляем глобальную функцию ym для TypeScript, чтобы можно было вызывать из React
+declare global {
+    interface Window {
+        // FIX: Unified the global declaration for `ym` to be consistent across files.
+        ym?: (id: number, action:string, ...args: any[]) => void;
+    }
+}
+
+
 const App: React.FC = () => {
     const [selectedDistrict, setSelectedDistrict] = useState<string | null>(null);
     const [isPolicyModalOpen, setIsPolicyModalOpen] = useState(false);
 
     useEffect(() => {
+        // Улучшенная логика отслеживания для Яндекс.Метрики с обратной связью.
+        // Это помогает диагностировать, была ли команда "hit" обработана скриптом.
+        if (typeof window.ym === 'function') {
+            console.log('Яндекс.Метрика: функция ym найдена. Отправляю просмотр страницы (hit).');
+            try {
+                window.ym(97931388, 'hit', window.location.href, {
+                    // Используем callback, чтобы убедиться, что команда была получена и обработана.
+                    callback: () => {
+                        console.log('%cЯндекс.Метрика: ✔️ Просмотр страницы успешно отправлен!', 'color: #22c55e; font-size: 14px; font-weight: bold;');
+                    },
+                    ctx: window 
+                });
+            } catch (e) {
+                console.error('Яндекс.Метрика: Произошла ошибка при вызове ym("hit").', e);
+            }
+        } else {
+            console.warn('Яндекс.Метрика: функция ym не найдена. Скрипт мог быть заблокирован или еще не загрузился.');
+        }
+        
         const observer = new IntersectionObserver(
             (entries) => {
                 entries.forEach((entry) => {

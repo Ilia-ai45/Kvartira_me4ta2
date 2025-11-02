@@ -9,7 +9,8 @@ const ROOM_OPTIONS = ["Студия", "1", "2", "3", "4+"];
 // Объявляем глобальную функцию ym для TypeScript
 declare global {
     interface Window {
-        ym: (id: number, action: string, goalName: string) => void;
+        // FIX: Unified the global declaration for `ym` to be consistent across files.
+        ym?: (id: number, action: string, ...args: any[]) => void;
     }
 }
 
