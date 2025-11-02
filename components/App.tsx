@@ -1,5 +1,6 @@
 
 
+
 import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import Header from './Header';
 import Hero from './Hero';
@@ -32,7 +33,7 @@ const App: React.FC = () => {
         if (typeof window.ym === 'function') {
             console.log('Яндекс.Метрика: функция ym найдена. Отправляю просмотр страницы (hit).');
             try {
-                window.ym(97931388, 'hit', window.location.href, {
+                window.ym(105075006, 'hit', window.location.href, {
                     // Используем callback, чтобы убедиться, что команда была получена и обработана.
                     callback: () => {
                         console.log('%cЯндекс.Метрика: ✔️ Просмотр страницы успешно отправлен!', 'color: #22c55e; font-size: 14px; font-weight: bold;');

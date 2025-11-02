@@ -1,5 +1,6 @@
 
 
+
 import React, { useState } from 'react';
 
 const formatCurrency = (value: number) => new Intl.NumberFormat('ru-RU', { style: 'currency', currency: 'RUB', minimumFractionDigits: 0 }).format(value);
@@ -171,7 +172,7 @@ const ContactForm: React.FC<ContactFormProps> = ({ showExtended, calculatorData,
             setSubmitted(true);
             
             if (typeof window.ym === 'function') {
-                window.ym(97931388, 'reachGoal', 'FORM_SUBMIT_SUCCESS');
+                window.ym(105075006, 'reachGoal', 'FORM_SUBMIT_SUCCESS');
             }
 
         } catch (error: any) {
