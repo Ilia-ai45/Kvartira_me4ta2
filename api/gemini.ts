@@ -1,7 +1,8 @@
 // File path: /api/gemini.ts
+import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { GoogleGenAI } from '@google/genai';
 
-export default async function handler(request, response) {
+export default async function handler(request: VercelRequest, response: VercelResponse) {
     if (request.method !== 'POST') {
         return response.status(405).json({ message: 'Method Not Allowed' });
     }

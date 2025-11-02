@@ -1,10 +1,11 @@
 // File path: /api/sendMessage.ts
+import type { VercelRequest, VercelResponse } from '@vercel/node';
 // Интеграция с Google Sheets временно отключена для отладки Telegram
 // import { google } from 'googleapis';
 
 const formatCurrency = (value: number) => new Intl.NumberFormat('ru-RU', { style: 'currency', currency: 'RUB', minimumFractionDigits: 0 }).format(value);
 
-export default async function handler(request, response) {
+export default async function handler(request: VercelRequest, response: VercelResponse) {
     if (request.method !== 'POST') {
         return response.status(405).json({ message: 'Method Not Allowed' });
     }
@@ -63,7 +64,7 @@ export default async function handler(request, response) {
                  throw new Error(`Telegram API Error: ${errorData.description || 'Unknown error'}`);
             }
             return { status: 'success', service: 'Telegram' };
-        } catch (error) {
+        } catch (error: any) {
             console.error("--- ERROR SENDING TO TELEGRAM ---");
             console.error("Timestamp:", new Date().toISOString());
             console.error("Error Message:", error.message);
@@ -94,7 +95,7 @@ export default async function handler(request, response) {
                 message: `Не удалось отправить заявку. Причина: неверная конфигурация сервера (Telegram).`
              });
         }
-    } catch (e) {
+    } catch (e: any) {
         console.error("Unhandled error in handler:", e);
         return response.status(500).json({
             success: false,
