@@ -2,6 +2,11 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { GoogleGenAI } from '@google/genai';
 
+interface Source {
+    uri: string;
+    title: string;
+}
+
 export default async function handler(request: VercelRequest, response: VercelResponse) {
     if (request.method !== 'POST') {
         return response.status(405).json({ message: 'Method Not Allowed' });
@@ -44,14 +49,14 @@ export default async function handler(request: VercelRequest, response: VercelRe
         const textContent = geminiResponse.text;
         const groundingChunks = geminiResponse.candidates[0]?.groundingMetadata?.groundingChunks;
 
-        let sourcesFromApi = [];
+        let sourcesFromApi: Source[] = [];
         if (groundingChunks) {
             sourcesFromApi = groundingChunks
                 .map((chunk: any) => ({
-                    uri: chunk.web?.uri,
-                    title: chunk.web?.title,
+                    uri: chunk.web?.uri as string | undefined,
+                    title: chunk.web?.title as string | undefined,
                 }))
-                .filter((source: { uri: string; title: string }) => !!source.uri && !!source.title);
+                .filter((source): source is Source => !!source.uri && !!source.title);
         }
         
         return response.status(200).json({ content: textContent || '', sources: sourcesFromApi });
