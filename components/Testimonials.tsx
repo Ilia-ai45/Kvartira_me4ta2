@@ -311,9 +311,9 @@ const ContentSections: React.FC = () => {
             
             <section id="faq" className="py-24 bg-stone-900 overflow-hidden">
                  <div className="container mx-auto px-6 max-w-6xl">
-                    <div className="lg:flex lg:gap-16 items-start">
-                        <div className="lg:w-5/12 mb-12 lg:mb-0 lg:sticky lg:top-24 animate-reveal anim-slide-right">
-                            <div className="relative rounded-2xl shadow-2xl w-full max-w-sm mx-auto lg:max-w-none overflow-hidden">
+                    <div className="lg:flex lg:gap-12 items-start">
+                        <div className="lg:w-6/12 mb-12 lg:mb-0 lg:sticky lg:top-24 animate-reveal anim-slide-right">
+                            <div className="relative rounded-2xl shadow-2xl w-full overflow-hidden">
                                 <img 
                                     src="https://res.cloudinary.com/dsajhtkyy/image/upload/v1761838062/photo_2025-10-29_17-49-52_ut603i.jpg" 
                                     alt="Дарья Бугровская, эксперт по недвижимости в Тюмени" 
@@ -326,7 +326,7 @@ const ContentSections: React.FC = () => {
                                 ></div>
                             </div>
                         </div>
-                        <div className="lg:w-7/12">
+                        <div className="lg:w-6/12">
                             <div className="text-center lg:text-left mb-12 animate-reveal anim-fade-up">
                                 <h2 className="text-3xl sm:text-4xl font-extrabold text-white mb-4">Остались вопросы? <br/> Я здесь, чтобы помочь!</h2>
                             </div>
