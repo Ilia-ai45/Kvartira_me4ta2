@@ -1,7 +1,5 @@
 // File path: /api/sendMessage.ts
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-// Интеграция с Google Sheets временно отключена для отладки Telegram
-// import { google } from 'googleapis';
 
 const formatCurrency = (value: number) => new Intl.NumberFormat('ru-RU', { style: 'currency', currency: 'RUB', minimumFractionDigits: 0 }).format(value);
 
@@ -10,24 +8,27 @@ export default async function handler(request: VercelRequest, response: VercelRe
         return response.status(405).json({ message: 'Method Not Allowed' });
     }
 
-    const {
-        TELEGRAM_BOT_TOKEN,
-        TELEGRAM_CHAT_ID,
-    } = process.env;
+    try {
+        const {
+            TELEGRAM_BOT_TOKEN,
+            TELEGRAM_CHAT_ID,
+        } = process.env;
 
-    const formData = request.body;
-
-    if (!formData.name || !formData.phone) {
-        return response.status(400).json({ message: 'Имя и телефон обязательны.' });
-    }
-
-    // --- Send to Telegram ---
-    const sendToTelegram = async () => {
-         if (!TELEGRAM_BOT_TOKEN || !TELEGRAM_CHAT_ID) {
-            console.warn("Telegram environment variables are not set. Skipping.");
-            return { status: 'skipped', service: 'Telegram' };
+        // 1. Проверка наличия переменных окружения
+        if (!TELEGRAM_BOT_TOKEN || !TELEGRAM_CHAT_ID) {
+            console.error("SERVER CONFIG ERROR: Telegram environment variables (TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID) are not set in Vercel.");
+            return response.status(500).json({
+                success: false,
+                message: 'Не удалось отправить заявку. Причина: неверная конфигурация сервера (Telegram).'
+            });
+        }
+        
+        const formData = request.body;
+        if (!formData.name || !formData.phone) {
+            return response.status(400).json({ message: 'Имя и телефон обязательны.' });
         }
 
+        // 2. Формирование сообщения
         let message = `*Новая заявка с сайта!*\n\n*Имя:* ${formData.name}\n*Телефон:* \`${formData.phone}\``;
 
         if (formData.showExtended && formData.calculatorData) {
@@ -45,61 +46,53 @@ export default async function handler(request: VercelRequest, response: VercelRe
             message += `Приоритет: *${priority || 'Не указано'}*\n`;
         }
 
+        // 3. Отправка в Telegram
         const telegramApiUrl = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
+        
+        const telegramResponse = await fetch(telegramApiUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                chat_id: TELEGRAM_CHAT_ID,
+                text: message,
+                parse_mode: 'Markdown',
+            }),
+            signal: AbortSignal.timeout(10000) // 10-секундный таймаут
+        });
 
-        try {
-            const telegramResponse = await fetch(telegramApiUrl, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    chat_id: TELEGRAM_CHAT_ID,
-                    text: message,
-                    parse_mode: 'Markdown',
-                }),
-                signal: AbortSignal.timeout(10000)
-            });
-
-            if (!telegramResponse.ok) {
-                 const errorData = await telegramResponse.json();
-                 throw new Error(`Telegram API Error: ${errorData.description || 'Unknown error'}`);
-            }
-            return { status: 'success', service: 'Telegram' };
-        } catch (error: any) {
-            console.error("--- ERROR SENDING TO TELEGRAM ---");
-            console.error("Timestamp:", new Date().toISOString());
-            console.error("Error Message:", error.message);
-            const userFriendlyMessage = `Ошибка Telegram: ${error.message}. Проверьте токен и ID чата.`;
-            return { status: 'failed', service: 'Telegram', error: userFriendlyMessage };
-        }
-    };
-
-    // --- Execute Telegram task ONLY ---
-    try {
-        const result = await sendToTelegram();
-
-        if (result.status === 'success') {
-            return response.status(200).json({ success: true, services: [result.service] });
-        } else if (result.status === 'failed') {
-            // If it failed, send a specific error message.
-            console.error("Telegram submission failed:", result);
-            return response.status(500).json({
-                success: false,
-                message: `Не удалось отправить заявку. Причина: ${result.error}`,
-                errors: [result]
-            });
-        } else { // Skipped
-             console.warn("Telegram submission skipped due to missing config.");
-             // This state should ideally not be reachable if the form is intended to work.
+        // 4. Обработка ответа от Telegram API
+        if (!telegramResponse.ok) {
+             const errorData = await telegramResponse.json();
+             const description = errorData.description || 'Unknown Telegram API error';
+             console.error(`Telegram API Error: ${description}`, errorData);
+             
+             let userMessage = `Ошибка отправки в Telegram.`;
+             if (description.includes('chat not found')) {
+                userMessage = 'Ошибка конфигурации: чат для уведомлений не найден. Проверьте TELEGRAM_CHAT_ID.'
+             } else if (description.includes('bot token')) {
+                userMessage = 'Ошибка конфигурации: неверный токен Telegram бота. Проверьте TELEGRAM_BOT_TOKEN.'
+             }
+             
              return response.status(500).json({
-                success: false,
-                message: `Не удалось отправить заявку. Причина: неверная конфигурация сервера (Telegram).`
+                 success: false,
+                 message: `Не удалось отправить заявку. ${userMessage}`
              });
         }
-    } catch (e: any) {
-        console.error("Unhandled error in handler:", e);
+        
+        // 5. Успешный ответ
+        return response.status(200).json({ success: true });
+
+    } catch (error: any) {
+        console.error("Unhandled error in sendMessage handler:", error);
+        
+        let errorMessage = 'Произошла внутренняя ошибка сервера.';
+        if (error.name === 'TimeoutError') {
+            errorMessage = 'Не удалось отправить заявку. Сервер Telegram не отвечает, попробуйте позже.'
+        }
+
         return response.status(500).json({
             success: false,
-            message: 'Произошла внутренняя ошибка сервера.',
+            message: errorMessage,
         });
     }
 }
