@@ -66,11 +66,11 @@ const Hero: React.FC = () => {
                 <div className="max-w-4xl mx-auto flex flex-col items-center">
                     <div className="animate-reveal">
                         <TextReveal 
-                            text="ПРОВЕРКА ОБНОВЛЕНИЯ: Новая версия сайта"
+                            text="Купить квартиру выгодно в новостройке Тюмени"
                             className="text-4xl sm:text-5xl md:text-6xl font-extrabold leading-tight mb-4"
                         />
                         <TextReveal 
-                            text="Помогу найти и купить квартиру мечты без комиссии и переплат, по сниженым ценам."
+                            text="Помогу найти и купить квартиру мечты без комиссии и переплат, по сниженным ценам."
                             className="text-base sm:text-lg md:text-xl text-gray-300 mb-8 max-w-2xl mx-auto"
                             baseDelay={0.5}
                         />
@@ -80,7 +80,7 @@ const Hero: React.FC = () => {
                         className="animate-reveal anim-fade-up bg-amber-500 text-gray-900 font-bold text-lg px-8 py-3 rounded-lg shadow-lg hover:bg-amber-400 focus:outline-none focus:ring-4 focus:ring-amber-500/50 transition-all duration-300"
                         style={{'--delay': '1s'} as React.CSSProperties}
                     >
-                        ПРОВЕРИТЬ ОБНОВЛЕНИЕ
+                        КУПИТЬ КВАРТИРУ
                     </button>
                 </div>
             </div>

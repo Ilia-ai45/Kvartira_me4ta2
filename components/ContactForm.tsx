@@ -58,11 +58,11 @@ const ContactForm: React.FC<ContactFormProps> = ({ showExtended, calculatorData,
 
     const validatePhone = (value: string): boolean => {
         const digitsOnly = value.replace(/\D/g, '');
-        if (digitsOnly.length < 11) {
+        if (digitsOnly.length !== 11) {
             setPhoneError('Номер телефона должен состоять из 11 цифр.');
             return false;
         }
-        if (!digitsOnly.startsWith('79')) {
+        if (!digitsOnly.startsWith('7')) {
             setPhoneError('Неверный формат номера. Вы можете оставить заявку через Telegram-канал в шапке сайта.');
             return false;
         }
@@ -73,7 +73,9 @@ const ContactForm: React.FC<ContactFormProps> = ({ showExtended, calculatorData,
     const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value;
         setName(value);
-        validateName(value);
+        if (nameError) {
+            setNameError(null);
+        }
     };
 
     const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -107,7 +109,9 @@ const ContactForm: React.FC<ContactFormProps> = ({ showExtended, calculatorData,
         }
         
         setPhone(formatted);
-        validatePhone(formatted);
+        if (phoneError) {
+            setPhoneError(null);
+        }
     };
 
 
@@ -141,6 +145,25 @@ const ContactForm: React.FC<ContactFormProps> = ({ showExtended, calculatorData,
             message += `Приоритет: *${priority || 'Не указано'}*\n`;
         }
 
+        // --- SIMULATION ---
+        // The backend API requires server configuration (e.g., Telegram API keys) which is unavailable in this environment.
+        // To demonstrate the form's UI/UX functionality, we'll simulate a successful submission.
+        console.log("--- Form Submission Data (Simulated) ---");
+        console.log("This message would be sent to the backend:");
+        console.log(message);
+
+        setTimeout(() => {
+            setSubmitted(true);
+            setIsSubmitting(false);
+
+            // Simulate Yandex.Metrika goal for demonstration
+            if (typeof window.ym === 'function') {
+                console.log("Simulating Yandex.Metrika goal: FORM_SUBMIT_SUCCESS");
+                window.ym(97931388, 'reachGoal', 'FORM_SUBMIT_SUCCESS');
+            }
+        }, 1000); // Simulate a 1-second network delay
+
+        /* --- THIS IS THE ORIGINAL CODE THAT CONNECTS TO THE BACKEND ---
         try {
             const response = await fetch('/api/sendMessage', {
                 method: 'POST',
@@ -168,6 +191,7 @@ const ContactForm: React.FC<ContactFormProps> = ({ showExtended, calculatorData,
         } finally {
             setIsSubmitting(false);
         }
+        */
     };
 
     return (

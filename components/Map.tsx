@@ -108,16 +108,29 @@ const Map: React.FC<MapProps> = ({ onPlacemarkClick }) => {
 
     return (
         <>
-            <section id="map" className="py-24 bg-stone-900">
-                <div className="container mx-auto px-6">
+            <section 
+                id="map" 
+                className="relative py-24 bg-cover bg-center"
+                style={{ backgroundImage: `url('https://res.cloudinary.com/dsajhtkyy/image/upload/v1762081570/%D1%82%D1%8E%D0%BC_r6jfwn.png')` }}
+            >
+                 <div className="absolute inset-0 bg-black/20 backdrop-blur-sm z-0"></div>
+                <div className="relative z-10 container mx-auto px-6">
                     <div className="text-center max-w-3xl mx-auto mb-16">
-                        <h2 className="text-3xl sm:text-4xl font-extrabold text-white mb-4">Интерактивная карта районов</h2>
-                        <p className="text-base sm:text-lg text-gray-400">
+                        <h2 
+                            className="text-3xl sm:text-4xl font-extrabold text-white mb-4"
+                            style={{ textShadow: '0 3px 6px rgba(0, 0, 0, 0.7)' }}
+                        >
+                            Интерактивная карта районов
+                        </h2>
+                        <p 
+                            className="text-base sm:text-lg text-gray-200"
+                            style={{ textShadow: '0 2px 4px rgba(0, 0, 0, 0.8)' }}
+                        >
                             Изучите районы Тюмени на карте. Нажмите на метку, чтобы узнать подробнее о локации и вызвать AI-ассистента для получения краткой сводки по району.
                         </p>
                     </div>
-                    <div className="bg-stone-800 rounded-2xl shadow-2xl overflow-hidden p-2 md:p-4 border border-stone-700">
-                        <div id="yandex-map" ref={mapContainerRef} className="w-full h-[60vh] min-h-[450px] sm:min-h-[500px] rounded-lg bg-stone-700"></div>
+                    <div className="rounded-2xl shadow-2xl overflow-hidden">
+                        <div id="yandex-map" ref={mapContainerRef} className="w-full h-[60vh] min-h-[450px] sm:min-h-[500px] rounded-xl bg-stone-700"></div>
                     </div>
                 </div>
             </section>
