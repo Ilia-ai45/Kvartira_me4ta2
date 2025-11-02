@@ -42,6 +42,7 @@ const ContactForm: React.FC<ContactFormProps> = ({ showExtended, calculatorData,
     // Validation state
     const [nameError, setNameError] = useState<string | null>(null);
     const [phoneError, setPhoneError] = useState<string | null>(null);
+    const [showErrors, setShowErrors] = useState(false);
 
     const validateName = (value: string): boolean => {
         if (!value.trim()) {
@@ -73,8 +74,8 @@ const ContactForm: React.FC<ContactFormProps> = ({ showExtended, calculatorData,
     const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value;
         setName(value);
-        if (nameError) {
-            setNameError(null);
+        if (showErrors) {
+            validateName(value);
         }
     };
 
@@ -109,14 +110,15 @@ const ContactForm: React.FC<ContactFormProps> = ({ showExtended, calculatorData,
         }
         
         setPhone(formatted);
-        if (phoneError) {
-            setPhoneError(null);
+        if (showErrors) {
+           validatePhone(formatted);
         }
     };
 
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        setShowErrors(true);
 
         const isNameValid = validateName(name);
         const isPhoneValid = validatePhone(phone);
@@ -127,50 +129,23 @@ const ContactForm: React.FC<ContactFormProps> = ({ showExtended, calculatorData,
 
         setIsSubmitting(true);
         setSubmitError(null);
-
+        
         const cleanPhone = phone.replace(/\D/g, '');
-        let message = `*Новая заявка с сайта!*\n\n*Имя:* ${name}\n*Телефон:* \`+${cleanPhone}\``;
 
-        if (showExtended && calculatorData) {
-            message += `\n\n*--- Расчет по ипотеке ---*\n`;
-            message += `Стоимость: *${formatCurrency(calculatorData.propertyPrice)}*\n`;
-            message += `Первый взнос: *${formatCurrency(calculatorData.downPayment)}*\n`;
-            message += `Ежемесячный платеж: *${formatCurrency(calculatorData.monthlyPayment)}*\n`;
-            message += `Ставка: *${calculatorData.interestRate}%*\n`;
-            if (calculatorData.quickDealDiscount) {
-                message += `*🔥 Активирована скидка за быструю сделку! (-100 000 руб)*\n`;
-            }
-            message += `\n*--- Пожелания клиента ---*\n`;
-            message += `Кол-во комнат: *${rooms || 'Не указано'}*\n`;
-            message += `Приоритет: *${priority || 'Не указано'}*\n`;
-        }
-
-        // --- SIMULATION ---
-        // The backend API requires server configuration (e.g., Telegram API keys) which is unavailable in this environment.
-        // To demonstrate the form's UI/UX functionality, we'll simulate a successful submission.
-        console.log("--- Form Submission Data (Simulated) ---");
-        console.log("This message would be sent to the backend:");
-        console.log(message);
-
-        setTimeout(() => {
-            setSubmitted(true);
-            setIsSubmitting(false);
-
-            // Simulate Yandex.Metrika goal for demonstration
-            if (typeof window.ym === 'function') {
-                console.log("Simulating Yandex.Metrika goal: FORM_SUBMIT_SUCCESS");
-                window.ym(97931388, 'reachGoal', 'FORM_SUBMIT_SUCCESS');
-            }
-        }, 1000); // Simulate a 1-second network delay
-
-        /* --- THIS IS THE ORIGINAL CODE THAT CONNECTS TO THE BACKEND ---
         try {
             const response = await fetch('/api/sendMessage', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ message }),
+                body: JSON.stringify({ 
+                    name, 
+                    phone: `+${cleanPhone}`,
+                    rooms,
+                    priority,
+                    showExtended,
+                    calculatorData
+                }),
             });
 
             if (!response.ok) {
@@ -184,14 +159,12 @@ const ContactForm: React.FC<ContactFormProps> = ({ showExtended, calculatorData,
                 window.ym(97931388, 'reachGoal', 'FORM_SUBMIT_SUCCESS');
             }
 
-
         } catch (error: any) {
             console.error("Submit error:", error);
             setSubmitError('Не удалось отправить заявку. Пожалуйста, свяжитесь со мной напрямую или попробуйте позже.');
         } finally {
             setIsSubmitting(false);
         }
-        */
     };
 
     return (
@@ -267,12 +240,12 @@ const ContactForm: React.FC<ContactFormProps> = ({ showExtended, calculatorData,
                                         value={name}
                                         onChange={handleNameChange}
                                         required
-                                        className={`w-full px-4 py-3 bg-zinc-700 border text-white rounded-lg focus:ring-amber-500 focus:border-amber-500 transition placeholder-gray-400 ${nameError ? 'border-red-500' : 'border-zinc-600'}`}
+                                        className={`w-full px-4 py-3 bg-zinc-700 border text-white rounded-lg focus:ring-amber-500 focus:border-amber-500 transition placeholder-gray-400 ${showErrors && nameError ? 'border-red-500' : 'border-zinc-600'}`}
                                         placeholder="Ваше имя"
                                         aria-invalid={!!nameError}
                                         aria-describedby="name-error"
                                     />
-                                    {nameError && <p id="name-error" className="text-sm text-red-400 mt-1">{nameError}</p>}
+                                    {showErrors && nameError && <p id="name-error" className="text-sm text-red-400 mt-1">{nameError}</p>}
                                 </div>
                                 <div>
                                     <label htmlFor="phone" className="sr-only">Номер телефона</label>
@@ -282,12 +255,12 @@ const ContactForm: React.FC<ContactFormProps> = ({ showExtended, calculatorData,
                                         value={phone}
                                         onChange={handlePhoneChange}
                                         required
-                                        className={`w-full px-4 py-3 bg-zinc-700 border text-white rounded-lg focus:ring-amber-500 focus:border-amber-500 transition placeholder-gray-400 ${phoneError ? 'border-red-500' : 'border-zinc-600'}`}
+                                        className={`w-full px-4 py-3 bg-zinc-700 border text-white rounded-lg focus:ring-amber-500 focus:border-amber-500 transition placeholder-gray-400 ${showErrors && phoneError ? 'border-red-500' : 'border-zinc-600'}`}
                                         placeholder="+7 (___) ___-__-__"
                                         aria-invalid={!!phoneError}
                                         aria-describedby="phone-error"
                                     />
-                                    {phoneError && <p id="phone-error" className="text-sm text-red-400 mt-1">{phoneError}</p>}
+                                    {showErrors && phoneError && <p id="phone-error" className="text-sm text-red-400 mt-1">{phoneError}</p>}
                                 </div>
                                 <div>
                                     <button

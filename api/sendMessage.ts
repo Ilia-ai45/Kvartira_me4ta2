@@ -1,56 +1,175 @@
-
 // File path: /api/sendMessage.ts
-// This code runs on a server (Vercel Serverless Function) and is not part of the frontend app.
+import { google } from 'googleapis';
+
+const formatCurrency = (value: number) => new Intl.NumberFormat('ru-RU', { style: 'currency', currency: 'RUB', minimumFractionDigits: 0 }).format(value);
+
+// Helper function to create the Google Sheets client
+const getSheetsClient = () => {
+    const { GOOGLE_SERVICE_ACCOUNT_EMAIL, GOOGLE_PRIVATE_KEY } = process.env;
+
+    if (!GOOGLE_SERVICE_ACCOUNT_EMAIL || !GOOGLE_PRIVATE_KEY) {
+        throw new Error("Google Service Account credentials are not set.");
+    }
+
+    // Vercel replaces newlines in env vars with \\n. We need to convert them back.
+    const privateKey = GOOGLE_PRIVATE_KEY.replace(/\\n/g, '\n');
+
+    const auth = new google.auth.GoogleAuth({
+        credentials: {
+            client_email: GOOGLE_SERVICE_ACCOUNT_EMAIL,
+            private_key: privateKey,
+        },
+        scopes: ['https://www.googleapis.com/auth/spreadsheets'],
+    });
+
+    return google.sheets({ version: 'v4', auth });
+};
+
 
 export default async function handler(request, response) {
-    // Only allow POST requests
     if (request.method !== 'POST') {
         return response.status(405).json({ message: 'Method Not Allowed' });
     }
 
-    const { TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID } = process.env;
+    const {
+        TELEGRAM_BOT_TOKEN,
+        TELEGRAM_CHAT_ID,
+        GOOGLE_SHEET_ID
+    } = process.env;
 
-    if (!TELEGRAM_BOT_TOKEN || !TELEGRAM_CHAT_ID) {
-        console.error("Telegram environment variables are not set.");
-        return response.status(500).json({ message: 'Ошибка конфигурации сервера: не найдены ключи для Telegram.' });
-    }
-    
-    // The request body is automatically parsed by Vercel for JSON content types
-    const { message } = request.body;
+    const formData = request.body;
 
-    if (!message) {
-        return response.status(400).json({ message: 'Тело запроса некорректно: отсутствует "message".' });
+    if (!formData.name || !formData.phone) {
+        return response.status(400).json({ message: 'Имя и телефон обязательны.' });
     }
 
-    const telegramApiUrl = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
+    // --- Task 1: Send to Google Sheets ---
+    const sendToGoogleSheets = async () => {
+        if (!GOOGLE_SHEET_ID) {
+            console.warn("Google Sheet ID is not configured. Skipping.");
+            return { status: 'skipped', service: 'Google Sheets' };
+        }
+        try {
+            const sheets = getSheetsClient();
+            
+            const timestamp = new Date();
+            const source = formData.showExtended ? 'Калькулятор' : 'Простая форма';
+            let details = '';
+            if (formData.showExtended && formData.calculatorData) {
+              const { calculatorData } = formData;
+              details = 
+                `Стоимость: ${formatCurrency(calculatorData.propertyPrice)} | ` +
+                `Взнос: ${formatCurrency(calculatorData.downPayment)} | ` +
+                `Платеж: ${formatCurrency(calculatorData.monthlyPayment)} | ` +
+                `Ставка: ${calculatorData.interestRate}% | ` +
+                `Скидка: ${calculatorData.quickDealDiscount ? 'Да' : 'Нет'}`;
+            }
 
-    try {
-        const telegramResponse = await fetch(telegramApiUrl, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                chat_id: TELEGRAM_CHAT_ID,
-                text: message,
-                parse_mode: 'Markdown', // Allows using bold (*text*), italic (_text_) etc.
-            }),
-        });
+            const rowData = [
+                timestamp.toLocaleString('ru-RU', { timeZone: 'Asia/Yekaterinburg' }), // Use a specific timezone
+                formData.name || '',
+                formData.phone || '',
+                formData.rooms || 'Не указано',
+                formData.priority || 'Не указано',
+                source,
+                details
+            ];
 
-        const data = await telegramResponse.json();
+            await sheets.spreadsheets.values.append({
+                spreadsheetId: GOOGLE_SHEET_ID,
+                range: 'Лист1!A1', // Assumes data is on a sheet named 'Лист1'
+                valueInputOption: 'USER_ENTERED',
+                resource: {
+                    values: [rowData],
+                },
+            });
 
-        if (!telegramResponse.ok) {
-            // Forward the error from Telegram API for better debugging
-            console.error('Telegram API Error:', data);
-            throw new Error(`Ошибка API Telegram: ${data.description || 'Неизвестная ошибка'}`);
+            return { status: 'success', service: 'Google Sheets' };
+        } catch (error) {
+            console.error("Error sending to Google Sheets:", error.message);
+            // Provide a more detailed error for debugging
+            const errorMessage = error.response?.data?.error?.message || error.message;
+            return { status: 'failed', service: 'Google Sheets', error: errorMessage };
+        }
+    };
+
+    // --- Task 2: Send to Telegram ---
+    const sendToTelegram = async () => {
+         if (!TELEGRAM_BOT_TOKEN || !TELEGRAM_CHAT_ID) {
+            console.warn("Telegram environment variables are not set. Skipping.");
+            return { status: 'skipped', service: 'Telegram' };
         }
 
-        // Send a success response back to the frontend
-        return response.status(200).json({ success: true });
+        let message = `*Новая заявка с сайта!*\n\n*Имя:* ${formData.name}\n*Телефон:* \`${formData.phone}\``;
 
-    } catch (error) {
-        console.error('Error sending message to Telegram:', error);
-        // Send a generic error response back to the frontend
-        return response.status(500).json({ message: 'Не удалось отправить сообщение.' });
+        if (formData.showExtended && formData.calculatorData) {
+            const { calculatorData, rooms, priority } = formData;
+            message += `\n\n*--- Заявка с калькулятора ---*\n`;
+            message += `Стоимость: *${formatCurrency(calculatorData.propertyPrice)}*\n`;
+            message += `Первый взнос: *${formatCurrency(calculatorData.downPayment)}*\n`;
+            message += `Ежемесячный платеж: *${formatCurrency(calculatorData.monthlyPayment)}*\n`;
+            message += `Ставка: *${calculatorData.interestRate}%*\n`;
+            if (calculatorData.quickDealDiscount) {
+                message += `*🔥 Активирована скидка за быструю сделку! (-100 000 руб)*\n`;
+            }
+            message += `\n*--- Пожелания клиента ---*\n`;
+            message += `Кол-во комнат: *${rooms || 'Не указано'}*\n`;
+            message += `Приоритет: *${priority || 'Не указано'}*\n`;
+        }
+
+        const telegramApiUrl = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
+
+        try {
+            const telegramResponse = await fetch(telegramApiUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    chat_id: TELEGRAM_CHAT_ID,
+                    text: message,
+                    parse_mode: 'Markdown',
+                }),
+                signal: AbortSignal.timeout(10000)
+            });
+
+            if (!telegramResponse.ok) {
+                 const errorData = await telegramResponse.json();
+                 throw new Error(`Telegram API Error: ${errorData.description || 'Unknown error'}`);
+            }
+            return { status: 'success', service: 'Telegram' };
+        } catch (error) {
+            console.error("Error sending to Telegram:", error);
+            return { status: 'failed', service: 'Telegram', error: error.message };
+        }
+    };
+
+    // --- Execute both tasks in parallel ---
+    const results = await Promise.allSettled([
+        sendToGoogleSheets(),
+        sendToTelegram()
+    ]);
+
+    const fulfilledResults = results.filter(
+        (r): r is PromiseFulfilledResult<{ status: string; service: string; error?: any; }> => r.status === 'fulfilled'
+    );
+    
+    const successfulSubmissions = fulfilledResults
+        .filter(r => r.value.status === 'success')
+        .map(r => r.value.service);
+
+    const failedSubmissions = fulfilledResults
+        .filter(r => r.value.status === 'failed');
+
+    if (successfulSubmissions.length > 0) {
+        if (failedSubmissions.length > 0) {
+             console.warn(`Partially successful submission. Failures:`, failedSubmissions);
+        }
+        return response.status(200).json({ success: true, services: successfulSubmissions });
+    } else {
+        console.error("All submissions failed:", failedSubmissions);
+        return response.status(500).json({
+            success: false,
+            message: 'Не удалось отправить заявку ни в один из сервисов.',
+            errors: failedSubmissions.map(f => f.value)
+        });
     }
 }
