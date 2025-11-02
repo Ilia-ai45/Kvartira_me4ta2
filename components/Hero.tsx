@@ -34,11 +34,11 @@ const Hero: React.FC = () => {
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
-    const handleScrollToContact = (e: React.MouseEvent<HTMLButtonElement>) => {
+    const handleScrollToCalculator = (e: React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();
-        const contactSection = document.getElementById('contact');
-        if (contactSection) {
-            contactSection.scrollIntoView({ behavior: 'smooth' });
+        const calculatorSection = document.getElementById('calculator');
+        if (calculatorSection) {
+            calculatorSection.scrollIntoView({ behavior: 'smooth' });
         }
     };
 
@@ -76,7 +76,7 @@ const Hero: React.FC = () => {
                         />
                     </div>
                     <button
-                        onClick={handleScrollToContact}
+                        onClick={handleScrollToCalculator}
                         className="animate-reveal anim-fade-up bg-amber-500 text-gray-900 font-bold text-lg px-8 py-3 rounded-lg shadow-lg hover:bg-amber-400 focus:outline-none focus:ring-4 focus:ring-amber-500/50 transition-all duration-300"
                         style={{'--delay': '1s'} as React.CSSProperties}
                     >
