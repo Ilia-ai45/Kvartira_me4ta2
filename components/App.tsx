@@ -1,6 +1,3 @@
-
-
-
 import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import Header from './Header';
 import Hero from './Hero';
@@ -17,7 +14,6 @@ import PrivacyPolicy from './PrivacyPolicy';
 // Объявляем глобальную функцию ym для TypeScript, чтобы можно было вызывать из React
 declare global {
     interface Window {
-        // FIX: Unified the global declaration for `ym` to be consistent across files.
         ym?: (id: number, action:string, ...args: any[]) => void;
     }
 }

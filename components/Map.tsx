@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef } from 'react';
 
 // To prevent TypeScript errors for the Yandex Maps API

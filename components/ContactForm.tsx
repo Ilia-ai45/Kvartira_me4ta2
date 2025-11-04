@@ -1,6 +1,3 @@
-
-
-
 import React, { useState } from 'react';
 
 const formatCurrency = (value: number) => new Intl.NumberFormat('ru-RU', { style: 'currency', currency: 'RUB', minimumFractionDigits: 0 }).format(value);
@@ -10,7 +7,6 @@ const ROOM_OPTIONS = ["Студия", "1", "2", "3", "4+"];
 // Объявляем глобальную функцию ym для TypeScript
 declare global {
     interface Window {
-        // FIX: Unified the global declaration for `ym` to be consistent across files.
         ym?: (id: number, action: string, ...args: any[]) => void;
     }
 }

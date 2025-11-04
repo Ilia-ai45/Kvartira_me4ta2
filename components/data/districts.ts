@@ -1,4 +1,3 @@
-
 import React from 'react';
 
 interface DistrictInfo {
@@ -85,7 +84,7 @@ export const districtData: Record<string, DistrictInfo> = {
             React.createElement('ul', { className: "list-disc list-inside space-y-2 mb-4" },
                 React.createElement('li', null, React.createElement('strong', null, 'Атмосфера приватности:'), ' Здесь доминирует частный сектор и малоэтажная застройка, что создает редкое для города ощущение уединенности.'),
                 React.createElement('li', null, React.createElement('strong', null, 'Экопарк как ваш личный двор:'), ' Район буквально растворяется в лесопарке «Затюменский». Это не просто парк рядом, это ваша среда обитания.'),
-                React.createElement('li', null, React.createElement('strong', null, 'Статус:'), ' Это спокойное, респектабельное место для тех, кто устал от шума, но не готов жертвовать близостью к центру.')
+                React.createElement('li', null, React.createElement('strong', null, 'Статус:'), ' Это спокойное, респектабильное место для тех, кто устал от шума, но не готов жертвовать близостью к центру.')
             ),
             React.createElement('p', null, 'Затюменка — это выбор тех, кто хочет совместить городской комфорт с жизнью на природе.')
         ),
