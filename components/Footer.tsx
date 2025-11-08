@@ -21,14 +21,14 @@ const Footer: React.FC<FooterProps> = ({ onPolicyClick }) => {
                             loading="lazy"
                         />
                         <div>
-                            <a href="//t.me/kvartirame4ta" target="_blank" rel="noopener noreferrer" className="inline-block">
+                            <a href="https://t.me/kvartirame4ta" target="_blank" rel="noopener noreferrer" className="inline-block">
                                 <h3 className="text-[22px] leading-snug md:text-2xl font-bold text-white mb-1 hover:text-amber-400 transition-colors">Дарья Бугровская</h3>
                             </a>
                             <p className="text-sm md:text-base text-gray-500">Эксперт по новостройкам Тюмени</p>
                         </div>
                     </div>
                     <div className="flex flex-col items-center md:items-end space-y-3">
-                         <a href="//t.me/kvartirame4ta" target="_blank" rel="noopener noreferrer" className="flex items-center text-lg text-white hover:opacity-80 transition-opacity">
+                         <a href="https://t.me/kvartirame4ta" target="_blank" rel="noopener noreferrer" className="flex items-center text-lg text-white hover:opacity-80 transition-opacity">
                             <TelegramIcon className="w-5 h-5 mr-3"/>
                             <span className="text-blue-400">КВАРТИРА</span><span className="text-amber-500">МЕЧТЫ</span>
                          </a>
