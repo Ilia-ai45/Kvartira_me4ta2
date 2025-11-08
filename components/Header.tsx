@@ -16,7 +16,7 @@ const Header: React.FC = () => {
     return (
         <header className={`sticky top-0 z-50 transition-all duration-300 ${isScrolled ? 'bg-zinc-900/80 backdrop-blur-sm shadow-lg shadow-black/20' : 'bg-transparent'}`}>
             <div className="container mx-auto px-4 sm:px-6 py-4 flex justify-between items-center">
-                <a href="//t.me/kvartirame4ta" target="_blank" rel="noopener noreferrer" className="flex items-center group">
+                <a href="https://t.me/kvartirame4ta" target="_blank" rel="noopener noreferrer" className="flex items-center group">
                     <div
                         role="img"
                         aria-label="Логотип Дарья Бугровская"
