@@ -27,99 +27,22 @@
     <meta property="twitter:description" content="Помогу купить квартиру в новостройке Тюмени без комиссии. Инженерный подход, доступ к закрытым базам и скидки от застройщиков.">
     <meta property="twitter:image" content="https://res.cloudinary.com/dsajhtkyy/image/upload/v1761740649/XXXL_pbux11.webp">
 
-    <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
     <!-- Yandex Maps API Script -->
     <script src="https://api-maps.yandex.ru/2.1/?apikey=5705fdf5-bd9d-4c14-9a3e-b18953b07fca&lang=ru_RU&load=package.standard,ObjectManager" type="text/javascript"></script>
-    
-    <style>
-        body {
-            font-family: 'Montserrat', sans-serif;
-            background-color: #1c1917; /* stone-900 */
-        }
-        .font-display {
-            font-family: 'Montserrat', sans-serif;
-            font-weight: 700;
-        }
-        /* Improve scroll-to-section behaviour with sticky header */
-        section[id] {
-            scroll-margin-top: 80px; /* Adjust this value based on your header's height */
-        }
-        input[type=range] {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 100%;
-            height: 8px;
-            background: #3f3f46; /* zinc-700 */
-            border-radius: 5px;
-            outline: none;
-            transition: background-color 0.2s ease-in-out;
-        }
-        input[type=range]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 20px;
-            height: 20px;
-            background: #F59E0B; /* amber-500 */
-            cursor: pointer;
-            border-radius: 50%;
-            margin-top: -6px; /* Center thumb */
-        }
-        input[type=range]::-moz-range-thumb {
-            width: 20px;
-            height: 20px;
-            background: #F59E0B;
-            cursor: pointer;
-            border-radius: 50%;
-        }
-        /* --- Advanced Animations --- */
-
-        /* Base trigger class for the observer */
-        .animate-reveal {
-            opacity: 0;
-            will-change: transform, opacity;
-        }
-
-        /* Animation types */
-        .animate-reveal.anim-fade-up { transform: translateY(3rem); }
-        .animate-reveal.anim-slide-left { transform: translateX(-3rem); }
-        .animate-reveal.anim-slide-right { transform: translateX(3rem); }
-        .animate-reveal.anim-scale-in { transform: scale(0.95); }
-
-        /* Visible state */
-        .animate-reveal.is-visible {
-            opacity: 1;
-            transform: none; /* Resets all transforms to default */
-            transition: opacity 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275), transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            transition-delay: var(--delay, 0s);
-        }
-
-        /* Word Reveal Animation */
-        .animate-reveal .word-reveal-child {
-            display: inline-block;
-            opacity: 0;
-            transform: translateY(100%);
-            transition: transform 0.6s cubic-bezier(0.2, 1, 0.3, 1), opacity 0.6s cubic-bezier(0.2, 1, 0.3, 1);
-            transition-delay: var(--delay);
-        }
-
-        .animate-reveal.is-visible .word-reveal-child {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    </style>
 <script type="importmap">
 {
   "imports": {
     "react": "https://aistudiocdn.com/react@^19.2.0",
     "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
     "react/": "https://aistudiocdn.com/react@^19.2.0/",
-    "@vercel/node": "https://aistudiocdn.com/@vercel/node@^5.5.4",
+    "express": "https://aistudiocdn.com/express@^5.1.0",
     "googleapis": "https://aistudiocdn.com/googleapis@^164.1.0",
-    "@google/genai": "https://aistudiocdn.com/@google/genai@^0.15.0",
-    "vite": "https://aistudiocdn.com/vite@^7.1.12",
+    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.29.0",
+    "vite": "https://aistudiocdn.com/vite@^7.2.1",
     "@vitejs/plugin-react": "https://aistudiocdn.com/@vitejs/plugin-react@^5.1.0"
   }
 }
@@ -136,11 +59,11 @@
             m[i].l=1*new Date();
             for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
             k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)
-        })(window, document,'script','https://mc.yandex.ru/metrika/tag.js?id=105075006', 'ym');
-    
-        ym(105075006, 'init', {ssr:true, webvisor:true, clickmap:true, ecommerce:"dataLayer", accurateTrackBounce:true, trackLinks:true});
+        })(window, document,'script','https://mc.yandex.ru/metrika/tag.js?id=105136960', 'ym');
+
+        ym(105136960, 'init', {ssr:true, webvisor:true, clickmap:true, ecommerce:"dataLayer", accurateTrackBounce:true, trackLinks:true});
     </script>
-    <noscript><div><img src="https://mc.yandex.ru/watch/105075006" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+    <noscript><div><img src="https://mc.yandex.ru/watch/105136960" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
     <!-- /Yandex.Metrika counter -->
 </body>
 </html>

@@ -1,6 +1,9 @@
 // File path: /api/gemini.ts
-import type { VercelRequest, VercelResponse } from '@vercel/node';
+import type { Request, Response } from 'express';
 import { GoogleGenAI } from '@google/genai';
+
+type VercelRequest = Request;
+type VercelResponse = Response;
 
 interface Source {
     uri: string;
@@ -36,7 +39,6 @@ export default async function handler(request: VercelRequest, response: VercelRe
             }
         });
 
-        // More robust response validation
         if (!geminiResponse || !geminiResponse.candidates || geminiResponse.candidates.length === 0) {
             console.error("Gemini API returned an empty or invalid response:", geminiResponse);
             const promptFeedback = geminiResponse?.promptFeedback;

@@ -42,8 +42,8 @@ const GeminiModal: React.FC<GeminiModalProps> = ({ districtName, onClose }) => {
                     <>
                         <p>{data.content}</p>
                         {data.sources && data.sources.length > 0 && (
-                            <div className="mt-4 pt-4 border-t border-gray-700">
-                                <h5 className="font-semibold text-gray-400 text-sm mb-2">Источники:</h5>
+                            <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                                <h5 className="font-semibold text-gray-500 dark:text-gray-400 text-sm mb-2">Источники:</h5>
                                 <ul className="list-disc list-inside text-xs space-y-1">
                                     {data.sources.map((source: Source, index: number) => (
                                         <li key={index}>
@@ -62,7 +62,7 @@ const GeminiModal: React.FC<GeminiModalProps> = ({ districtName, onClose }) => {
             } catch (error: any) {
                  console.error("Gemini API call failed, using fallback content:", error);
                  if (districtName && districtData[districtName]) {
-                     setContent(districtData[districtName].description);
+                     setContent(<div dangerouslySetInnerHTML={{ __html: districtData[districtName].description }} />);
                  } else {
                      setContent(
                         <p className="text-red-400">
@@ -96,16 +96,16 @@ const GeminiModal: React.FC<GeminiModalProps> = ({ districtName, onClose }) => {
             role="dialog"
         >
             <div 
-                className="bg-gray-800 rounded-xl shadow-2xl w-full max-w-lg border border-gray-700 transform transition-all duration-300 scale-95 opacity-0 animate-fade-in-scale"
+                className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-lg border border-gray-200 dark:border-gray-700 transform transition-all duration-300 scale-95 opacity-0 animate-fade-in-scale"
                 onClick={(e) => e.stopPropagation()}
                 style={{ animationFillMode: 'forwards', animationDuration: '0.2s' }}
             >
-                <div className="flex justify-between items-start p-5 border-b border-gray-700">
+                <div className="flex justify-between items-start p-5 border-b border-gray-200 dark:border-gray-700">
                     <h3 className="text-xl font-bold">
                         <span className="text-amber-500">Обзор района:</span>
-                        <span className="block text-white mt-1 font-semibold">{processedName}</span>
+                        <span className="block text-gray-900 dark:text-white mt-1 font-semibold">{processedName}</span>
                     </h3>
-                    <button onClick={onClose} aria-label="Close modal" className="text-gray-400 hover:text-white transition-colors rounded-full p-1 focus:outline-none focus:ring-2 focus:ring-amber-500">
+                    <button onClick={onClose} aria-label="Close modal" className="text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-white transition-colors rounded-full p-1 focus:outline-none focus:ring-2 focus:ring-amber-500">
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
                     </button>
                 </div>
@@ -113,11 +113,11 @@ const GeminiModal: React.FC<GeminiModalProps> = ({ districtName, onClose }) => {
                 <div className="p-6 min-h-[250px] max-h-[60vh] overflow-y-auto">
                     {isLoading ? (
                         <div className="flex flex-col justify-center items-center h-full text-center">
-                            <div className="w-8 h-8 border-4 border-t-amber-500 border-gray-600 rounded-full animate-spin"></div>
-                            <p className="mt-4 text-gray-400">Ассистент подбирает информацию...</p>
+                            <div className="w-8 h-8 border-4 border-t-amber-500 border-gray-300 dark:border-gray-600 rounded-full animate-spin"></div>
+                            <p className="mt-4 text-gray-500 dark:text-gray-400">Ассистент подбирает информацию...</p>
                         </div>
                     ) : (
-                        <div className="text-gray-300 leading-relaxed space-y-4">
+                        <div className="text-gray-600 dark:text-gray-300 leading-relaxed space-y-4">
                             {content}
                         </div>
                     )}

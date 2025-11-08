@@ -1,20 +1,25 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# Лендинг для агента по недвижимости
 
-# Run and deploy your AI Studio app
+Это проект целевой страницы, созданный для агента по недвижимости. Он использует React, TypeScript, Vite, Tailwind CSS и серверные функции для взаимодействия с Gemini API и отправки уведомлений.
 
-This contains everything you need to run your app locally.
+## Локальный запуск
 
-View your app in AI Studio: https://ai.studio/apps/drive/1iFLNIfYgVDiYypIbx196at43ckcvjPS-
+**Требования:** Node.js
 
-## Run Locally
+1.  Установите зависимости:
+    `npm install`
+2.  Создайте файл `.env` в корне проекта и добавьте в него ваши API-ключи и переменные:
+    ```
+    API_KEY="ВАШ_GEMINI_API_КЛЮЧ"
+    TELEGRAM_BOT_TOKEN="ВАШ_ТЕЛЕГРАМ_БОТ_ТОКЕН"
+    TELEGRAM_CHAT_ID="ID_ВАШЕГО_ТЕЛЕГРАМ_ЧАТА"
+    
+    # Опционально, для Google Sheets
+    GOOGLE_SHEET_ID="ID_ВАШЕЙ_ТАБЛИЦЫ"
+    GOOGLE_CLIENT_EMAIL="EMAIL_СЕРВИСНОГО_АККАУНТА"
+    GOOGLE_PRIVATE_KEY="ПРИВАТНЫЙ_КЛЮЧ_СЕРВИСНОГО_АККАУНТА"
+    ```
+3.  Запустите сервер разработки:
+    `npm run dev`
 
-**Prerequisites:**  Node.js
-
-
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+Приложение будет доступно по адресу `http://localhost:5173`.

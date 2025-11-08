@@ -10,6 +10,8 @@ import ContactForm from './ContactForm';
 import Map from './Map';
 import GeminiModal from './GeminiModal';
 import PrivacyPolicy from './PrivacyPolicy';
+import ThankYouPage from './ThankYouPage'; // Импортируем новую страницу
+import ScrollToTopButton from './ScrollToTopButton';
 
 // Объявляем глобальную функцию ym для TypeScript, чтобы можно было вызывать из React
 declare global {
@@ -20,16 +22,17 @@ declare global {
 
 
 const App: React.FC = () => {
+    const [pathname, setPathname] = useState(window.location.pathname);
     const [selectedDistrict, setSelectedDistrict] = useState<string | null>(null);
     const [isPolicyModalOpen, setIsPolicyModalOpen] = useState(false);
 
     useEffect(() => {
         // Улучшенная логика отслеживания для Яндекс.Метрики с обратной связью.
         // Это помогает диагностировать, была ли команда "hit" обработана скриптом.
-        if (typeof window.ym === 'function') {
+        if (typeof window.ym === 'function' && pathname === '/') {
             console.log('Яндекс.Метрика: функция ym найдена. Отправляю просмотр страницы (hit).');
             try {
-                window.ym(105075006, 'hit', window.location.href, {
+                window.ym(105136960, 'hit', window.location.href, {
                     // Используем callback, чтобы убедиться, что команда была получена и обработана.
                     callback: () => {
                         console.log('%cЯндекс.Метрика: ✔️ Просмотр страницы успешно отправлен!', 'color: #22c55e; font-size: 14px; font-weight: bold;');
@@ -39,7 +42,10 @@ const App: React.FC = () => {
             } catch (e) {
                 console.error('Яндекс.Метрика: Произошла ошибка при вызове ym("hit").', e);
             }
-        } else {
+        } else if (pathname !== '/') {
+             // 'hit' для других страниц будет вызываться в самих компонентах страниц
+        }
+        else {
             console.warn('Яндекс.Метрика: функция ym не найдена. Скрипт мог быть заблокирован или еще не загрузился.');
         }
         
@@ -61,7 +67,7 @@ const App: React.FC = () => {
         elements.forEach((el) => observer.observe(el));
 
         return () => observer.disconnect();
-    }, []);
+    }, [pathname]);
     
     useEffect(() => {
         const isModalOpen = selectedDistrict !== null || isPolicyModalOpen;
@@ -76,6 +82,13 @@ const App: React.FC = () => {
             document.body.style.overflow = '';
         };
     }, [selectedDistrict, isPolicyModalOpen]);
+
+    // Handle browser back/forward navigation
+    useEffect(() => {
+        const handlePopState = () => setPathname(window.location.pathname);
+        window.addEventListener('popstate', handlePopState);
+        return () => window.removeEventListener('popstate', handlePopState);
+    }, []);
 
 
     // Lifted state from MortgageCalculator
@@ -110,9 +123,19 @@ const App: React.FC = () => {
     const handleCloseModal = () => {
         setSelectedDistrict(null);
     };
+    
+    if (pathname === '/thank-you') {
+        return (
+            <>
+                <ThankYouPage onPolicyClick={() => setIsPolicyModalOpen(true)} />
+                <PrivacyPolicy isOpen={isPolicyModalOpen} onClose={() => setIsPolicyModalOpen(false)} />
+                <ScrollToTopButton />
+            </>
+        );
+    }
 
     return (
-        <div className="text-gray-200">
+        <div className="text-gray-800 dark:text-gray-200">
             <Header />
             <main>
                 <Hero />
@@ -149,6 +172,7 @@ const App: React.FC = () => {
             <Footer onPolicyClick={() => setIsPolicyModalOpen(true)} />
             <GeminiModal districtName={selectedDistrict} onClose={handleCloseModal} />
             <PrivacyPolicy isOpen={isPolicyModalOpen} onClose={() => setIsPolicyModalOpen(false)} />
+            <ScrollToTopButton />
         </div>
     );
 };

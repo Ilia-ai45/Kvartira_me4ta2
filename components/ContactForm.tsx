@@ -33,7 +33,6 @@ const ContactForm: React.FC<ContactFormProps> = ({ showExtended, calculatorData,
     const [rooms, setRooms] = useState('');
     const [priority, setPriority] = useState('');
     
-    const [submitted, setSubmitted] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [submitError, setSubmitError] = useState<string | null>(null);
 
@@ -165,11 +164,12 @@ const ContactForm: React.FC<ContactFormProps> = ({ showExtended, calculatorData,
                 throw new Error(errorMessage);
             }
 
-            setSubmitted(true);
-            
             if (typeof window.ym === 'function') {
-                window.ym(105075006, 'reachGoal', 'FORM_SUBMIT_SUCCESS');
+                window.ym(105136960, 'reachGoal', 'FORM_SUBMIT_SUCCESS');
             }
+            
+            // Redirect to thank you page
+            window.location.href = '/thank-you';
 
         } catch (error: any) {
             console.error("Submit error:", error);
@@ -180,27 +180,22 @@ const ContactForm: React.FC<ContactFormProps> = ({ showExtended, calculatorData,
     };
 
     return (
-        <section id="contact" className="py-24 bg-zinc-900">
+        <section id="contact" className="py-24 bg-gray-100 dark:bg-zinc-900">
             <div className="container mx-auto px-6">
-                <div className="max-w-3xl mx-auto bg-zinc-800 rounded-2xl p-8 md:p-12 shadow-2xl border border-zinc-700 text-center animate-reveal anim-scale-in">
-                    {submitted ? (
-                        <div className="py-8">
-                            <h3 className="text-3xl font-bold text-amber-400 mb-3">Спасибо!</h3>
-                            <p className="text-gray-300">Ваша заявка принята. Я свяжусь с вами в ближайшее время!</p>
-                        </div>
-                    ) : (
+                <div className="max-w-3xl mx-auto bg-white dark:bg-zinc-800 rounded-2xl p-8 md:p-12 shadow-2xl border border-gray-200 dark:border-zinc-700 text-center animate-reveal anim-scale-in">
+                    
                         <>
                             {showExtended && calculatorData ? (
                                 <>
-                                    <h2 className="text-3xl sm:text-4xl font-extrabold text-white mb-4">Завершите ваш запрос</h2>
-                                    <p className="text-base sm:text-lg text-gray-400 mb-8">
+                                    <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900 dark:text-white mb-4">Завершите ваш запрос</h2>
+                                    <p className="text-base sm:text-lg text-gray-600 dark:text-gray-400 mb-8">
                                         Мы уже знаем ваши финансовые параметры. Уточните детали, и я подберу идеальные варианты.
                                     </p>
-                                    <div className="bg-zinc-900/50 border border-zinc-700 rounded-lg p-4 mb-6 text-left grid grid-cols-2 gap-4 text-sm">
-                                        <div><span className="text-gray-400">Стоимость:</span> <strong className="block text-white">{formatCurrency(calculatorData.propertyPrice)}</strong></div>
-                                        <div><span className="text-gray-400">Первый взнос:</span> <strong className="block text-white">{formatCurrency(calculatorData.downPayment)}</strong></div>
-                                        <div><span className="text-gray-400">Платеж в месяц:</span> <strong className="block text-white">{formatCurrency(calculatorData.monthlyPayment)}</strong></div>
-                                        <div><span className="text-gray-400">Ставка:</span> <strong className="block text-white">{calculatorData.interestRate}%</strong></div>
+                                    <div className="bg-gray-100 dark:bg-zinc-900/50 border border-gray-200 dark:border-zinc-700 rounded-lg p-4 mb-6 text-left grid grid-cols-2 gap-4 text-sm">
+                                        <div><span className="text-gray-500 dark:text-gray-400">Стоимость:</span> <strong className="block text-gray-900 dark:text-white">{formatCurrency(calculatorData.propertyPrice)}</strong></div>
+                                        <div><span className="text-gray-500 dark:text-gray-400">Первый взнос:</span> <strong className="block text-gray-900 dark:text-white">{formatCurrency(calculatorData.downPayment)}</strong></div>
+                                        <div><span className="text-gray-500 dark:text-gray-400">Платеж в месяц:</span> <strong className="block text-gray-900 dark:text-white">{formatCurrency(calculatorData.monthlyPayment)}</strong></div>
+                                        <div><span className="text-gray-500 dark:text-gray-400">Ставка:</span> <strong className="block text-gray-900 dark:text-white">{calculatorData.interestRate}%</strong></div>
                                     </div>
                                     {calculatorData.quickDealDiscount && (
                                         <div className="bg-amber-500/10 border border-amber-500 text-amber-400 rounded-lg p-4 mb-8 text-center">
@@ -211,8 +206,8 @@ const ContactForm: React.FC<ContactFormProps> = ({ showExtended, calculatorData,
                                 </>
                             ) : (
                                 <>
-                                    <h2 className="text-3xl sm:text-4xl font-extrabold text-white mb-4">Нужна консультация?</h2>
-                                    <p className="text-base sm:text-lg text-gray-400 mb-8">
+                                    <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900 dark:text-white mb-4">Нужна консультация?</h2>
+                                    <p className="text-base sm:text-lg text-gray-600 dark:text-gray-400 mb-8">
                                         Оставьте контакты, и я свяжусь с вами, чтобы ответить на все ваши вопросы. Это бесплатно и ни к чему не обязывает.
                                     </p>
                                 </>
@@ -222,23 +217,23 @@ const ContactForm: React.FC<ContactFormProps> = ({ showExtended, calculatorData,
                                 {showExtended && (
                                     <>
                                         <div>
-                                            <label className="block font-semibold text-gray-300 mb-3 text-center">Количество комнат</label>
+                                            <label className="block font-semibold text-gray-700 dark:text-gray-300 mb-3 text-center">Количество комнат</label>
                                             <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
                                                 {ROOM_OPTIONS.map(opt => (
-                                                    <button type="button" key={opt} onClick={() => setRooms(opt)} className={`px-2 py-2 rounded-lg transition-colors duration-200 font-semibold ${rooms === opt ? 'bg-amber-500 text-gray-900' : 'bg-zinc-700 hover:bg-zinc-600 text-white'}`}>
+                                                    <button type="button" key={opt} onClick={() => setRooms(opt)} className={`px-2 py-2 rounded-lg transition-colors duration-200 font-semibold ${rooms === opt ? 'bg-amber-500 text-gray-900' : 'bg-gray-200 dark:bg-zinc-700 hover:bg-gray-300 dark:hover:bg-zinc-600 text-gray-800 dark:text-white'}`}>
                                                         {opt}
                                                     </button>
                                                 ))}
                                             </div>
                                         </div>
                                         <div>
-                                            <label htmlFor="priority" className="block font-semibold text-gray-300 mb-2 text-center">Что является приоритетным?</label>
+                                            <label htmlFor="priority" className="block font-semibold text-gray-700 dark:text-gray-300 mb-2 text-center">Что является приоритетным?</label>
                                             <input
                                                 type="text"
                                                 id="priority"
                                                 value={priority}
                                                 onChange={(e) => setPriority(e.target.value)}
-                                                className="w-full px-4 py-3 bg-zinc-700 border border-zinc-600 text-white rounded-lg focus:ring-amber-500 focus:border-amber-500 transition placeholder-gray-400"
+                                                className="w-full px-4 py-3 bg-gray-100 dark:bg-zinc-700 border border-gray-300 dark:border-zinc-600 text-gray-900 dark:text-white rounded-lg focus:ring-amber-500 focus:border-amber-500 transition placeholder-gray-500 dark:placeholder-gray-400"
                                                 placeholder="Школа, Детский сад, Район,"
                                             />
                                         </div>
@@ -252,7 +247,7 @@ const ContactForm: React.FC<ContactFormProps> = ({ showExtended, calculatorData,
                                         value={name}
                                         onChange={handleNameChange}
                                         required
-                                        className={`w-full px-4 py-3 bg-zinc-700 border text-white rounded-lg focus:ring-amber-500 focus:border-amber-500 transition placeholder-gray-400 ${showErrors && nameError ? 'border-red-500' : 'border-zinc-600'}`}
+                                        className={`w-full px-4 py-3 bg-gray-100 dark:bg-zinc-700 border text-gray-900 dark:text-white rounded-lg focus:ring-amber-500 focus:border-amber-500 transition placeholder-gray-500 dark:placeholder-gray-400 ${showErrors && nameError ? 'border-red-500' : 'border-gray-300 dark:border-zinc-600'}`}
                                         placeholder="Ваше имя"
                                         aria-invalid={!!nameError}
                                         aria-describedby="name-error"
@@ -267,7 +262,7 @@ const ContactForm: React.FC<ContactFormProps> = ({ showExtended, calculatorData,
                                         value={phone}
                                         onChange={handlePhoneChange}
                                         required
-                                        className={`w-full px-4 py-3 bg-zinc-700 border text-white rounded-lg focus:ring-amber-500 focus:border-amber-500 transition placeholder-gray-400 ${showErrors && phoneError ? 'border-red-500' : 'border-zinc-600'}`}
+                                        className={`w-full px-4 py-3 bg-gray-100 dark:bg-zinc-700 border text-gray-900 dark:text-white rounded-lg focus:ring-amber-500 focus:border-amber-500 transition placeholder-gray-500 dark:placeholder-gray-400 ${showErrors && phoneError ? 'border-red-500' : 'border-gray-300 dark:border-zinc-600'}`}
                                         placeholder="+7 (___) ___-__-__"
                                         aria-invalid={!!phoneError}
                                         aria-describedby="phone-error"
@@ -296,7 +291,7 @@ const ContactForm: React.FC<ContactFormProps> = ({ showExtended, calculatorData,
                                 </button>.
                             </p>
                         </>
-                    )}
+                    
                 </div>
             </div>
         </section>

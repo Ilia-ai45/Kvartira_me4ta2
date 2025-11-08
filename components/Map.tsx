@@ -129,7 +129,7 @@ const Map: React.FC<MapProps> = ({ onPlacemarkClick }) => {
                         </p>
                     </div>
                     <div className="rounded-2xl shadow-2xl overflow-hidden">
-                        <div id="yandex-map" ref={mapContainerRef} className="w-full h-[60vh] min-h-[450px] sm:min-h-[500px] rounded-xl bg-stone-700"></div>
+                        <div id="yandex-map" ref={mapContainerRef} className="w-full h-[60vh] min-h-[450px] sm:min-h-[500px] rounded-xl bg-gray-300 dark:bg-stone-700"></div>
                     </div>
                 </div>
             </section>

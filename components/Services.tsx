@@ -25,7 +25,7 @@ const steps = [
 
 const StepCard: React.FC<typeof steps[0]> = ({ num, title, description }) => (
     <div className="relative pl-16">
-        <div className="absolute left-0 top-0 h-12 w-12 bg-gray-800/60 backdrop-blur-sm border-2 border-amber-400 text-amber-400 rounded-full flex items-center justify-center font-bold text-xl">
+        <div className="absolute left-0 top-0 h-12 w-12 bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm border-2 border-amber-400 text-amber-400 rounded-full flex items-center justify-center font-bold text-xl">
             {num}
         </div>
         <h3 className="text-xl font-bold mb-2 text-white">{title}</h3>

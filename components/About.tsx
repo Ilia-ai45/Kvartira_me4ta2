@@ -22,12 +22,12 @@ const benefits = [
 
 const BenefitItem: React.FC<{ title: string; description: string }> = ({ title, description }) => (
     <div className="flex items-start space-x-4">
-        <div className="flex-shrink-0 bg-gray-900/50 border-2 border-amber-400 rounded-full w-10 h-10 flex items-center justify-center">
+        <div className="flex-shrink-0 bg-white/50 dark:bg-gray-900/50 border-2 border-amber-400 rounded-full w-10 h-10 flex items-center justify-center">
              <CheckIcon className="w-5 h-5 text-amber-400" />
         </div>
         <div>
-            <h3 className="text-lg font-bold text-white">{title}</h3>
-            <p className="text-gray-400">{description}</p>
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white">{title}</h3>
+            <p className="text-gray-600 dark:text-gray-400">{description}</p>
         </div>
     </div>
 );

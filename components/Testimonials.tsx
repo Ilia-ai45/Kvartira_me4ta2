@@ -100,10 +100,10 @@ const faqs = [
                 <p className="mb-4">
                     Да, абсолютно. Мою работу оплачивает застройщик по партнерскому договору.
                 </p>
-                <p className="font-semibold text-white mb-3">
+                <p className="font-semibold text-gray-800 dark:text-white mb-3">
                     Ваша прямая выгода работы со мной, а не напрямую с застройщиком:
                 </p>
-                <ul className="list-disc list-inside space-y-2 text-gray-300 pl-1">
+                <ul className="list-disc list-inside space-y-2 text-gray-600 dark:text-gray-300 pl-1">
                     <li>
                         Вы получаете мои <strong>персональные СКИДКИ</strong> у застройщика.
                     </li>
@@ -132,15 +132,15 @@ const faqs = [
 ];
 
 const FaqItem: React.FC<{ q: string, a: React.ReactNode, isOpen: boolean, onClick: () => void }> = ({ q, a, isOpen, onClick }) => (
-    <div className="border-b border-stone-700 py-6">
+    <div className="border-b border-gray-200 dark:border-stone-700 py-6">
         <button onClick={onClick} className="w-full flex justify-between items-center text-left">
-            <h3 className="text-lg font-semibold text-white">{q}</h3>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{q}</h3>
             <span className={`transform transition-transform duration-300 ${isOpen ? 'rotate-45' : 'rotate-0'}`}>
                 <svg className="w-6 h-6 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
             </span>
         </button>
         <div className={`overflow-hidden transition-all duration-500 ease-in-out ${isOpen ? 'max-h-[30rem] pt-4' : 'max-h-0'}`}>
-            <div className="text-gray-400 leading-relaxed">{a}</div>
+            <div className="text-gray-600 dark:text-gray-400 leading-relaxed">{a}</div>
         </div>
     </div>
 );
@@ -208,8 +208,8 @@ const CaseCard: React.FC<CaseCardProps> = ({ caseItem }) => {
     const dotIndex = getDotIndex();
 
     return (
-        <div className="bg-stone-800 rounded-lg shadow-lg overflow-hidden border border-stone-700 flex flex-col h-full">
-            <div className="relative h-56 w-full overflow-hidden group bg-[#A6937B]">
+        <div className="bg-gray-50 dark:bg-stone-800 rounded-lg shadow-lg overflow-hidden border border-gray-200 dark:border-stone-700 flex flex-col h-full">
+            <div className="relative h-56 w-full overflow-hidden group bg-gray-200 dark:bg-[#A6937B]">
                 <div 
                     className={`flex h-full ${transitionClass}`}
                     style={{ transform: `translateX(-${currentIndex * 100}%)` }}
@@ -234,13 +234,13 @@ const CaseCard: React.FC<CaseCardProps> = ({ caseItem }) => {
                 </div>
             </div>
             <div className="p-6 flex flex-col flex-grow">
-                <h3 className="font-bold text-xl text-white">{caseItem.title}</h3>
-                <p className="text-gray-400 mb-4">{caseItem.subtitle}</p>
+                <h3 className="font-bold text-xl text-gray-900 dark:text-white">{caseItem.title}</h3>
+                <p className="text-gray-600 dark:text-gray-400 mb-4">{caseItem.subtitle}</p>
                 <ul className="space-y-2 text-sm mt-auto">
                     {caseItem.results.map((result, i) => (
                         <li key={i} className="flex items-start">
                             <svg className="w-4 h-4 text-green-500 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"></path></svg>
-                            <span className="text-gray-300">{result}</span>
+                            <span className="text-gray-700 dark:text-gray-300">{result}</span>
                         </li>
                     ))}
                 </ul>
@@ -258,11 +258,11 @@ const ContentSections: React.FC = () => {
 
     return (
         <>
-            <section id="cases" className="py-24 bg-stone-900">
+            <section id="cases" className="py-24 bg-white dark:bg-stone-900">
                 <div className="container mx-auto px-6">
                     <div className="text-center max-w-3xl mx-auto mb-16 animate-reveal anim-fade-up">
-                        <h2 className="text-3xl sm:text-4xl font-extrabold text-white mb-4">Реальные кейсы и решённые задачи</h2>
-                        <p className="text-base sm:text-lg text-gray-400">
+                        <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900 dark:text-white mb-4">Реальные кейсы и решённые задачи</h2>
+                        <p className="text-base sm:text-lg text-gray-600 dark:text-gray-400">
                            Лучше всего о моей работе говорят результаты моих клиентов.
                         </p>
                     </div>
@@ -276,19 +276,19 @@ const ContentSections: React.FC = () => {
                 </div>
             </section>
 
-            <section id="reviews" className="py-24 bg-zinc-900">
+            <section id="reviews" className="py-24 bg-gray-100 dark:bg-zinc-900">
                 <div className="container mx-auto px-6">
                     <div className="text-center max-w-3xl mx-auto mb-16 animate-reveal anim-fade-up">
-                        <h2 className="text-3xl sm:text-4xl font-extrabold text-white mb-4">Что говорят мои клиенты</h2>
+                        <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900 dark:text-white mb-4">Что говорят мои клиенты</h2>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                         {testimonials.map((testimonial, index) => (
-                            <div key={index} className="bg-zinc-800 p-8 rounded-lg shadow-md border border-zinc-700 flex flex-col h-full animate-reveal anim-scale-in" style={{'--delay': `${index * 0.1}s`} as React.CSSProperties}>
-                                <p className="text-gray-300 mb-6 flex-grow">"{testimonial.quote}"</p>
+                            <div key={index} className="bg-white dark:bg-zinc-800 p-8 rounded-lg shadow-md border border-gray-200 dark:border-zinc-700 flex flex-col h-full animate-reveal anim-scale-in" style={{'--delay': `${index * 0.1}s`} as React.CSSProperties}>
+                                <p className="text-gray-600 dark:text-gray-300 mb-6 flex-grow">"{testimonial.quote}"</p>
                                 <div className="flex items-center mt-auto">
                                     <img src={testimonial.avatar} alt={testimonial.name} className="w-14 h-14 rounded-full mr-4 object-cover" />
                                     <div>
-                                        <p className="font-bold text-white">{testimonial.name}</p>
+                                        <p className="font-bold text-gray-900 dark:text-white">{testimonial.name}</p>
                                     </div>
                                 </div>
                             </div>
@@ -307,7 +307,7 @@ const ContentSections: React.FC = () => {
                 </div>
             </section>
             
-            <section id="faq" className="py-24 bg-stone-900 overflow-hidden">
+            <section id="faq" className="py-24 bg-white dark:bg-stone-900 overflow-hidden">
                  <div className="container mx-auto px-6 max-w-6xl">
                     <div className="lg:flex lg:gap-12 items-start">
                         <div className="lg:w-6/12 mb-12 lg:mb-0 lg:sticky lg:top-24 animate-reveal anim-slide-right">
@@ -326,7 +326,7 @@ const ContentSections: React.FC = () => {
                         </div>
                         <div className="lg:w-6/12">
                             <div className="text-center lg:text-left mb-12 animate-reveal anim-fade-up">
-                                <h2 className="text-3xl sm:text-4xl font-extrabold text-white mb-4">Остались вопросы? <br/> Я здесь, чтобы помочь!</h2>
+                                <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900 dark:text-white mb-4">Остались вопросы? <br/> Я здесь, чтобы помочь!</h2>
                             </div>
                             <div>
                                 {faqs.map((faq, index) => (
@@ -335,27 +335,27 @@ const ContentSections: React.FC = () => {
                                     </div>
                                 ))}
                             </div>
-                            <div className="mt-12 bg-stone-800 border-l-4 border-amber-500 p-8 rounded-lg shadow-lg animate-reveal anim-fade-up" style={{'--delay': '0.4s'} as React.CSSProperties}>
-                                <p className="font-semibold text-base sm:text-lg text-white mb-4">
+                            <div className="mt-12 bg-gray-100 dark:bg-stone-800 border-l-4 border-amber-500 p-8 rounded-lg shadow-lg animate-reveal anim-fade-up" style={{'--delay': '0.4s'} as React.CSSProperties}>
+                                <p className="font-semibold text-base sm:text-lg text-gray-900 dark:text-white mb-4">
                                     Зачастую, обращаясь напрямую к застройщику, клиенты уходят с базовыми ценами и квартирами, которые плохо продаются.
                                 </p>
-                                <p className="text-gray-300 mb-4 font-semibold">Работая со мной, Вы получаете:</p>
-                                <ul className="space-y-3 text-gray-300">
+                                <p className="text-gray-700 dark:text-gray-300 mb-4 font-semibold">Работая со мной, Вы получаете:</p>
+                                <ul className="space-y-3 text-gray-700 dark:text-gray-300">
                                     <li className="flex items-start">
                                         <CheckIcon className="w-5 h-5 text-amber-400 mr-3 mt-1 flex-shrink-0" />
-                                        <span><strong className="text-white">Лучшие предложения</strong>, которые зачастую ниже рынка.</span>
+                                        <span><strong className="text-gray-800 dark:text-white">Лучшие предложения</strong>, которые зачастую ниже рынка.</span>
                                     </li>
                                     <li className="flex items-start">
                                         <CheckIcon className="w-5 h-5 text-amber-400 mr-3 mt-1 flex-shrink-0" />
-                                        <span>Доступ к лучшим предложениям от <strong className="text-white">всех застройщиков</strong> города.</span>
+                                        <span>Доступ к лучшим предложениям от <strong className="text-gray-800 dark:text-white">всех застройщиков</strong> города.</span>
                                     </li>
                                      <li className="flex items-start">
                                         <CheckIcon className="w-5 h-5 text-amber-400 mr-3 mt-1 flex-shrink-0" />
-                                        <span>Доступ к <strong className="text-white">новым квартирам</strong>, еще не открытым к продажам.</span>
+                                        <span>Доступ к <strong className="text-gray-800 dark:text-white">новым квартирам</strong>, еще не открытым к продажам.</span>
                                     </li>
                                      <li className="flex items-start">
                                         <CheckIcon className="w-5 h-5 text-amber-400 mr-3 mt-1 flex-shrink-0" />
-                                        <span>Фиксируем <strong className="text-white">персональные скидки</strong> до 7 дней.</span>
+                                        <span>Фиксируем <strong className="text-gray-800 dark:text-white">персональные скидки</strong> до 7 дней.</span>
                                     </li>
                                 </ul>
                             </div>

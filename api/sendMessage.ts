@@ -1,6 +1,9 @@
 // File path: /api/sendMessage.ts
-import type { VercelRequest, VercelResponse } from '@vercel/node';
+import type { Request, Response } from 'express';
 import { google } from 'googleapis';
+
+type VercelRequest = Request;
+type VercelResponse = Response;
 
 const formatCurrency = (value: number) => new Intl.NumberFormat('ru-RU', { style: 'currency', currency: 'RUB', minimumFractionDigits: 0 }).format(value);
 
@@ -18,7 +21,6 @@ export default async function handler(request: VercelRequest, response: VercelRe
             GOOGLE_SHEET_ID,
         } = process.env;
 
-        // 1. Проверка наличия переменных окружения
         if (!TELEGRAM_BOT_TOKEN || !TELEGRAM_CHAT_ID) {
             console.error("SERVER CONFIG ERROR: Telegram environment variables are not set.");
             return response.status(500).json({
@@ -32,7 +34,6 @@ export default async function handler(request: VercelRequest, response: VercelRe
             return response.status(400).json({ message: 'Имя и телефон обязательны.' });
         }
 
-        // 2. Формирование сообщения для Telegram
         const messageTitle = formData.showExtended ? `*Новая заявка на подбор!*` : `*Запрос на консультацию!*`;
         let message = `${messageTitle}\n\n*Имя:* ${formData.name}\n*Телефон:* \`${formData.phone}\``;
 
@@ -51,7 +52,6 @@ export default async function handler(request: VercelRequest, response: VercelRe
             message += `Приоритет: *${priority || 'Не указано'}*\n`;
         }
 
-        // 3. Отправка в Telegram
         const telegramApiUrl = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
         
         const telegramResponse = await fetch(telegramApiUrl, {
@@ -62,7 +62,7 @@ export default async function handler(request: VercelRequest, response: VercelRe
                 text: message,
                 parse_mode: 'Markdown',
             }),
-            signal: AbortSignal.timeout(10000) // 10-секундный таймаут
+            signal: AbortSignal.timeout(10000)
         });
 
         if (!telegramResponse.ok) {
@@ -81,7 +81,6 @@ export default async function handler(request: VercelRequest, response: VercelRe
              });
         }
 
-        // 4. Отправка в Google Sheets (не блокирует успешный ответ, если Telegram сработал)
         try {
             if (!GOOGLE_PRIVATE_KEY || !GOOGLE_CLIENT_EMAIL || !GOOGLE_SHEET_ID) {
                 console.warn("SERVER CONFIG WARNING: Google Sheets environment variables are not set. Skipping sheet update.");
@@ -119,13 +118,13 @@ export default async function handler(request: VercelRequest, response: VercelRe
                         formData.name,
                         formData.phone,
                         'Консультация',
-                        '', '', '', '', '', '', '' // Пустые ячейки для сохранения структуры
+                        '', '', '', '', '', '', ''
                     ];
                 }
 
                 await sheets.spreadsheets.values.append({
                     spreadsheetId: GOOGLE_SHEET_ID,
-                    range: 'Лист1!A1', // Appends to the first empty row of the table
+                    range: 'Лист1!A1',
                     valueInputOption: 'USER_ENTERED',
                     requestBody: {
                         values: [rowValues],
@@ -134,10 +133,8 @@ export default async function handler(request: VercelRequest, response: VercelRe
             }
         } catch (sheetsError) {
             console.error("Google Sheets API Error:", sheetsError);
-            // Не отправляем ошибку клиенту, так как основная функция (Telegram) выполнена
         }
         
-        // 5. Успешный ответ
         return response.status(200).json({ success: true });
 
     } catch (error: any) {
